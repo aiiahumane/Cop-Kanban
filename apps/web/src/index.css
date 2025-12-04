@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f7f8fb;
+  --text: #111827;
+  --surface: #ffffff;
+  --muted: #6b7280;
+  --neutral: #e5e7eb;
+}
+
+[data-theme="dark"] {
+  --bg: #0f1115;
+  --text: #e5e7eb;
+  --surface: #161a22;
+  --muted: #9ca3af;
+  --neutral: #4b5563;
+}
+
+.card { background: var(--surface); }
