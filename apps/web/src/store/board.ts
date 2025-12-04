@@ -1,34 +1,73 @@
+
 import { create } from 'zustand'
 
-type ColumnKey = 'PEDIDO'|'COLA'|'INICIO'|'EN_PROCESO'|'FINALIZADA'|'FACTURADA'
+// Tipos de columnas
+export type ColumnKey = 'PEDIDO'|'COLA'|'INICIO'|'EN_PROCESO'|'FINALIZADA'|'FACTURADA'
 
-const defaultColumns = [
-  { key: 'PEDIDO', label: 'Pedido' },
-  { key: 'COLA', label: 'Cola' },
-  { key: 'INICIO', label: 'Inicio' },
-  { key: 'EN_PROCESO', label: 'En Proceso' },
-  { key: 'FINALIZADA', label: 'Finalizada' },
-  { key: 'FACTURADA', label: 'Facturada' },
+// Tipos de dominio
+export interface Column { key: ColumnKey; label: string }
+export interface Responsable { nombre: string; colorHex?: string }
+export interface Assignee { id: string; nombre: string; colorHex?: string; activo?: boolean }
+export interface Card {
+  id: string
+  titulo: string
+  fechaInicio?: string
+  duracionPrevista?: number
+  diasRestantes?: number
+  responsable?: Responsable
+  recursos?: Assignee[]
+}
+
+// Estado del tablero
+export interface BoardState {
+  columns: Column[]
+  cardsByColumn: Record<ColumnKey, Card[]>
+  moveCard: (cardId: string, newCol: ColumnKey) => void
+}
+
+// Columnas por defecto
+const defaultColumns: Column[] = [
+  { key: 'PEDIDO',      label: 'Pedido' },
+  { key: 'COLA',        label: 'Cola' },
+  { key: 'INICIO',      label: 'Inicio' },
+  { key: 'EN_PROCESO',  label: 'En Proceso' },
+  { key: 'FINALIZADA',  label: 'Finalizada' },
+  { key: 'FACTURADA',   label: 'Facturada' },
 ]
 
-export const useBoardStore = create<any>((set, get)=>({
+// Datos demo
+const initialCards: Record<ColumnKey, Card[]> = {
+  PEDIDO: [{
+    id: 'c1',
+    titulo: 'Ficha demo',
+    fechaInicio: '2025-01-12',
+    duracionPrevista: 5,
+    diasRestantes: 3,
+    responsable: { nombre: 'Ana', colorHex: '#fde68a' },
+    recursos: [{ id: 'r1', nombre: 'Compresor', colorHex: '#93c5fd', activo: true }],
+  }],
+  COLA: [],
+  INICIO: [],
+  EN_PROCESO: [],
+  FINALIZADA: [],
+  FACTURADA: [],
+}
+
+// Store tipado
+export const useBoardStore = create<BoardState>()((set, get) => ({
   columns: defaultColumns,
-  cardsByColumn: {
-    PEDIDO: [
-      { id: 'c1', titulo: 'Ficha demo', fechaInicio: '2025-01-12', duracionPrevista: 5, diasRestantes: 3,
-        responsable: { nombre: 'Ana', colorHex: '#fde68a' }, recursos:[{id:'r1', nombre:'Compresor', colorHex:'#93c5fd', activo:true}] }
-    ]
-  },
-  moveCard: (cardId: string, newCol: ColumnKey)=>{
-    const map = { ...get().cardsByColumn }
-    for (const k of Object.keys(map)) {
-      const idx = map[k].findIndex((c:any)=> c.id===cardId)
-      if(idx>-1){
-        const [card] = map[k].splice(idx,1)
-        (map[newCol] ||= []).push(card)
+  cardsByColumn: initialCards,
+  moveCard: (cardId, newCol) => {
+    const map: Record<ColumnKey, Card[]> = { ...get().cardsByColumn }
+    for (const key of Object.keys(map) as ColumnKey[]) {
+      const idx = map[key].findIndex((c) => c.id === cardId)
+      if (idx > -1) {
+        const [extracted] = map[key].splice(idx, 1)
+        (map[newCol] ??= []).push(extracted)
         break
       }
     }
     set({ cardsByColumn: map })
-  }
+  },
 }))
+``
