@@ -4,6 +4,7 @@ import type { Card } from '../store/board'
 export function CardView({ card }: { card: Card }){
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: card.id })
   const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined
+
   return (
     <article ref={setNodeRef} style={style} {...listeners} {...attributes}
       className="card border border-gray-200/40 rounded-lg p-2 shadow-sm">
@@ -26,8 +27,6 @@ export function CardView({ card }: { card: Card }){
             {r.nombre}{!r.activo && ' (Inactivo)'}
           </span>
         ))}
-      </footer>
+           </footer>
     </article>
   )
-}
-``
