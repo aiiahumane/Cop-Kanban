@@ -52,21 +52,27 @@ const initialCards: Record<ColumnKey, Card[]> = {
   FACTURADA: [],
 }
 
-// Store tipado
-export const useBoardStore = create<BoardState>()((set, get) => ({
+// Store tipado (¡sin backticks extra!)
+export const useBoardStore = create<BoardState>((set, get) => ({
   columns: defaultColumns,
   cardsByColumn: initialCards,
   moveCard: (cardId, newCol) => {
     const map: Record<ColumnKey, Card[]> = { ...get().cardsByColumn }
+    // Buscar la columna que contiene la ficha
     for (const key of Object.keys(map) as ColumnKey[]) {
       const idx = map[key].findIndex((c) => c.id === cardId)
       if (idx > -1) {
-        const [extracted] = map[key].splice(idx, 1)
-        (map[newCol] ??= []).push(extracted)
+        const extracted = map[key][idx]
+        // eliminar del origen sin mutar
+        map[key] = [
+          ...map[key].slice(0, idx),
+          ...map[key].slice(idx + 1),
+        ]
+        // añadir al destino
+        map[newCol] = [...(map[newCol] ?? []), extracted]
         break
       }
     }
     set({ cardsByColumn: map })
   },
 }))
-``
