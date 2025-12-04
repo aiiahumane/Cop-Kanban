@@ -1,6 +1,7 @@
 import { useDraggable } from '@dnd-kit/core'
+import type { Card } from '../store/board'
 
-export function CardView({ card }: any){
+export function CardView({ card }: { card: Card }){
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: card.id })
   const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined
   return (
@@ -20,7 +21,7 @@ export function CardView({ card }: any){
         <div>Restante: {card.diasRestantes ?? '—'} d</div>
       </div>
       <footer className="mt-2 flex flex-wrap gap-1">
-        {(card.recursos||[]).map((r:any)=> (
+        {(card.recursos||[]).map((r)=> (
           <span key={r.id} className="text-xs px-2 py-0.5 rounded-md" style={{background: r.activo? (r.colorHex||'#d1fae5') : 'var(--neutral)'}}>
             {r.nombre}{!r.activo && ' (Inactivo)'}
           </span>
@@ -29,3 +30,4 @@ export function CardView({ card }: any){
     </article>
   )
 }
+``
